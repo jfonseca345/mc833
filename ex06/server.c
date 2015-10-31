@@ -10,49 +10,11 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
+#include "sockutils.h"
+
 #define LISTENQ 10
 #define MAXDATASIZE 100
 
-/**
- * Create a socket and verify error.
- */
-int Socket(int family, int type, int flags) {
-	int sockfd;
-	if ((sockfd = socket(family, type, flags)) < 0) {
-		perror("socket");
-		exit(1);
-	} else
-		return sockfd;
-}
-
-/**
- *
- */
-void Bind(int fd, struct sockaddr *addr, socklen_t length) {
-	if (bind(fd, addr, length) == -1) {
-		perror("bind");
-		exit(1);
-	}
-}
-
-/**
- *
- */
-void Listen(int socket, int n) {
-	if (listen(socket, LISTENQ) == -1) {
-		perror("listen");
-		exit(1);
-	}
-}
-
-int Accept(int socket, struct sockaddr *addr, socklen_t *lengthptr) {
-	int connfd;
-	if ((connfd = accept(socket, addr, lengthptr)) == -1) {
-		perror("accept");
-		exit(1);
-	}
-	return connfd;
-}
 
 int main(int argc, char **argv) {
 	int listenfd; // socket descriptor to listen to connection requests.

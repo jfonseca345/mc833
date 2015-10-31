@@ -30,3 +30,11 @@
 
 # Debug files
 *.dSYM/
+
+# Eclipse stuff
+.cproject
+.project
+
+#binaries
+server
+client

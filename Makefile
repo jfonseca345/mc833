@@ -1,14 +1,16 @@
 CC=gcc
 CFLAGS=-Wall -g
 DEPS=myconn_err.h
+SRCDIR=ex06/
+
 
 all: server client
 
-server:
-	$(CC) $(CFLAGS) server.c -o server
+server: $(SRCDIR)/server.c
+	$(CC) $(CFLAGS) $(SRCDIR)server.c -o server
 
-client:
-	$(CC) $(CFLAGS) client.c -o client
+client: $(SRCDIR)/client.c
+	$(CC) $(CFLAGS) $(SRCDIR)client.c -o client
 
 clean:
 	rm server client

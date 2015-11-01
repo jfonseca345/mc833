@@ -14,13 +14,44 @@
 
 #define LISTENQ 10
 #define MAXDATASIZE 100
+#define MAXOUTPUTSIZE 200
 
+/**
+ * Exec cmd and send output to client
+ */
+void exec_cmd(char *cmd, int sock) {
+	char output[MAXOUTPUTSIZE] = { 0 };
+	FILE *fp;
+
+	/** Discart new line stuff, for telnet reason.**/
+	cmd[strlen(cmd) - 2] = 0;
+	strcat(cmd, " 2>&1");
+
+	fp = popen(cmd, "r");
+
+	while (fgets(output, sizeof(output) - 1, fp) != NULL) {
+		write(sock, output, strlen(output));
+	}
+
+	pclose(fp);
+
+}
+
+/**
+ * Exec cmd and send output to client
+ */
+void exec_and_echo(char *cmd, int sock) {
+	cmd[strlen(cmd) - 2] = 0;
+	system(cmd);
+	write(sock, cmd, strlen(cmd));
+}
 
 int main(int argc, char **argv) {
 	int listenfd; // socket descriptor to listen to connection requests.
 	int connfd; // socket descriptor to connect to client and send data.
 	struct sockaddr_in servaddr; // struct that will contain server address info.
 	char buf[MAXDATASIZE]; // buffer that will cotain data to be send to client.
+	char cmd[MAXDATASIZE]; // buffer that will cotain data to be send to client.
 	time_t ticks;
 	int port;
 
@@ -28,12 +59,14 @@ int main(int argc, char **argv) {
 	socklen_t len; // addr size
 	char ipstr[INET6_ADDRSTRLEN];
 
+	pid_t pid;
+
 	if (argc < 2) {
 		printf("Usage:\n\t%s <listen-port>\n", argv[0]);
 		exit(1);
 	}
 
-	port = atoi(argv[0]);
+	port = atoi(argv[1]);
 
 	/** Create a ipv4 TCP socket that will be used to listen connections.
 	 *  Also verify return for error checking. **/
@@ -60,6 +93,17 @@ int main(int argc, char **argv) {
 		 *  Also verify return for error checking. **/
 		connfd = Accept(listenfd, (struct sockaddr *) NULL, NULL);
 
+		/** creat child to answer **/
+		if ((pid = fork()) == 0) {
+			close(listenfd);
+
+			bzero(cmd, sizeof(cmd));
+			read(connfd, cmd, sizeof(cmd));
+			exec_and_echo(cmd, connfd);
+			close(connfd);
+			exit(0);
+		}
+
 		/** creates a string containing current data. **/
 		ticks = time(NULL);
 		snprintf(buf, sizeof(buf), "%.24s\r\n", ctime(&ticks));
@@ -71,7 +115,7 @@ int main(int argc, char **argv) {
 		/** convert read address from binary to string. **/
 		inet_ntop(AF_INET, &addr.sin_addr, ipstr, sizeof(ipstr));
 		/** print socket address info **/
-		printf("%s : %d\n", ipstr, ntohs(addr.sin_port));
+//		printf("%s : %d\n", ipstr, ntohs(addr.sin_port));
 
 		/** close socket connfd**/
 		close(connfd);

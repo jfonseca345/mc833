@@ -16,7 +16,7 @@
 #define MAXOUTPUTSIZE 200
 
 /**
- * Exec cmd and send output to client
+ * Exec cmd and send output to client (This is will be used in next activity)
  */
 void exec_cmd(char *cmd, int sock) {
 	char output[MAXOUTPUTSIZE] = { 0 };

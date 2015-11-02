@@ -61,5 +61,11 @@ int Accept(int socket, struct sockaddr *addr, socklen_t *lengthptr) {
 	return connfd;
 }
 
+void Connect(int socket, struct sockaddr *addr, socklen_t length) {
+	if (connect(socket, addr, length) < 0) {
+		perror("connect error");
+		exit(1);
+	}
+}
 
 #endif /* EX06_SOCKUTILS_H_ */

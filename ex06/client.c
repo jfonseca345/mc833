@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 	struct sockaddr_in getsock; // struct that will be used to get local socket info.
 	socklen_t len = sizeof(struct sockaddr); // sockeadd_in struct len.
 
-	/** Show error message if usage in incorrect. **/
+	/** Show error message if usage is incorrect. **/
 	if (argc != 3) {
 		bzero(error, sizeof(error));
 		strcpy(error, "Usage:\n\t");
@@ -44,9 +44,9 @@ int main(int argc, char **argv) {
 	/** Creates a IPV4 TCP socket for client and its return for error checking.**/
 	sockfd = Socket(AF_INET, SOCK_STREAM, 0);
 
-	bzero(&servaddr, sizeof(servaddr)); // inialize struct to all zeros.
+	bzero(&servaddr, sizeof(servaddr)); // initialize struct with zeros.
 	servaddr.sin_family = AF_INET; // set address family to IPV4.
-	servaddr.sin_port = htons(atoi(argv[2])); // set port to 9999, htons convert from host to server representation of short int.
+	servaddr.sin_port = htons(atoi(argv[2])); // set port. htons converts from host to server representation of short int.
 
 	/** convert address informed in comand line argv[1] to a binary representation to be stored in
 	 *  sockaddr_in struct in sin_addr field. Also verify return for error checking. **/
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 	/** starts connection with server address stored in servaddr using socket created
-	 *  before and described by sockfd. Alsi verify return for error checking. **/
+	 *  before and described by sockfd. Also verify return for error checking. **/
 	Connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
 	printf("Host server info:\n");
@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
 	printf("Host client info:\n");
 	/** get socket info related to sockfd, and put information in getsock. */
 	getsockname(sockfd, (struct sockaddr *) &getsock, &len);
-	/** print to stout, making data representation convertion from network to host. **/
+	/** print to stdout, making data representation convertion from network to host. **/
 	printf("%s : %d\n", inet_ntoa(getsock.sin_addr), ntohs(getsock.sin_port));
 	printf("=============================\n");
 

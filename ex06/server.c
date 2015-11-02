@@ -22,7 +22,7 @@ void exec_cmd(char *cmd, int sock) {
 	char output[MAXOUTPUTSIZE] = { 0 };
 	FILE *fp;
 
-	/** Discart new line stuff, for telnet reason.**/
+	/** Discard new line stuff, for telnet reason.**/
 	cmd[strlen(cmd) - 2] = 0;
 	strcat(cmd, " 2>&1");
 
@@ -40,7 +40,7 @@ void exec_cmd(char *cmd, int sock) {
  * Exec cmd and send output to client
  */
 void exec_and_echo(char *cmd, int sock) {
-//	cmd[strlen(cmd) - 2] = 0; // discart new line, for telnet tests.
+//	cmd[strlen(cmd) - 2] = 0; // discard new line, for telnet tests.
 	system(cmd);
 	write(sock, cmd, strlen(cmd));
 }
@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 	int listenfd; // socket descriptor to listen to connection requests.
 	int connfd; // socket descriptor to connect to client and send data.
 	struct sockaddr_in servaddr; // struct that will contain server address info.
-	char cmd[MAXDATASIZE]; // buffer that will cotain data to be send to client.
+	char cmd[MAXDATASIZE]; // buffer that will contain data to be send to client.
 	int port;
 
 	struct sockaddr_in client_addr; // struct that will contain remote address info.
@@ -68,9 +68,9 @@ int main(int argc, char **argv) {
 	 *  Also verify return for error checking. **/
 	listenfd = Socket(AF_INET, SOCK_STREAM, 0);
 
-	bzero(&servaddr, sizeof(servaddr)); // inialize struct to all zeros.
-	servaddr.sin_family = AF_INET; // set address family to IPV4
-	servaddr.sin_addr.s_addr = htonl(INADDR_ANY); // set address to any. Convertions from host to network representation needed.
+	bzero(&servaddr, sizeof(servaddr)); // initialize struct with zeros.
+	servaddr.sin_family = AF_INET; // set address family to IPV4.
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY); // set address to ANY. Convertions from host to network representation needed.
 	servaddr.sin_port = htons(port); // set port. Convertion from host to network representation neeeded.
 
 	/** Bind the socket described by listenfd to address created before.
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 	Bind(listenfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
 	/** Marks the socket listenfd as a passsive socket that will respond
-	 *  to connections request and will have a queue with a maximum length
+	 *  to connection requests and will have a queue with a maximum length
 	 *  of LISTENQ. **/
 	Listen(listenfd, LISTENQ);
 
@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
 		 *  Also verify return for error checking. **/
 		connfd = Accept(listenfd, (struct sockaddr *) &client_addr, &client_len);
 
-		/** creat child to answer **/
+		/** create child to answer **/
 		if ((pid = fork()) == 0) {
 			close(listenfd);
 

@@ -13,7 +13,6 @@
 #include "sockutils.h"
 
 #define LISTENQ 10
-#define MAXDATASIZE 100
 #define MAXOUTPUTSIZE 200
 
 /**
@@ -41,7 +40,7 @@ void exec_cmd(char *cmd, int sock) {
  * Exec cmd and send output to client
  */
 void exec_and_echo(char *cmd, int sock) {
-	cmd[strlen(cmd) - 2] = 0;
+//	cmd[strlen(cmd) - 2] = 0;
 	system(cmd);
 	write(sock, cmd, strlen(cmd));
 }
@@ -50,9 +49,7 @@ int main(int argc, char **argv) {
 	int listenfd; // socket descriptor to listen to connection requests.
 	int connfd; // socket descriptor to connect to client and send data.
 	struct sockaddr_in servaddr; // struct that will contain server address info.
-	char buf[MAXDATASIZE]; // buffer that will cotain data to be send to client.
 	char cmd[MAXDATASIZE]; // buffer that will cotain data to be send to client.
-	time_t ticks;
 	int port;
 
 	struct sockaddr_in addr; // struct that will contain remote address info.
@@ -98,17 +95,15 @@ int main(int argc, char **argv) {
 			close(listenfd);
 
 			bzero(cmd, sizeof(cmd));
-			read(connfd, cmd, sizeof(cmd));
-			exec_and_echo(cmd, connfd);
+			while (read(connfd, cmd, sizeof(cmd))) {
+				exec_and_echo(cmd, connfd);
+				bzero(cmd, sizeof(cmd));
+			}
+//			read(connfd, cmd, sizeof(cmd));
+
 			close(connfd);
 			exit(0);
 		}
-
-		/** creates a string containing current data. **/
-		ticks = time(NULL);
-		snprintf(buf, sizeof(buf), "%.24s\r\n", ctime(&ticks));
-		/** buffer write content to socket. **/
-		write(connfd, buf, strlen(buf));
 
 		/** get address info of socket connfd. **/
 		getpeername(connfd, (struct sockaddr *) &addr, &len);
@@ -117,7 +112,7 @@ int main(int argc, char **argv) {
 		/** print socket address info **/
 //		printf("%s : %d\n", ipstr, ntohs(addr.sin_port));
 
-		/** close socket connfd**/
+//		/** close socket connfd**/
 		close(connfd);
 	}
 	return (0);

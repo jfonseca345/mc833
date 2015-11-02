@@ -20,6 +20,8 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
+#define MAXDATASIZE 100
+
 /**
  * Create a socket and verify error.
  */

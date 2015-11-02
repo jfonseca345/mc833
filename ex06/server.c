@@ -94,6 +94,11 @@ int main(int argc, char **argv) {
 		if ((pid = fork()) == 0) {
 			close(listenfd);
 
+			printf("=============================\n");
+			printf("Session started.\n");
+			printf("Client host info:\n");
+			print_sock_info(connfd);
+
 			bzero(cmd, sizeof(cmd));
 			while (read(connfd, cmd, sizeof(cmd))) {
 				exec_and_echo(cmd, connfd);
@@ -102,6 +107,8 @@ int main(int argc, char **argv) {
 //			read(connfd, cmd, sizeof(cmd));
 
 			close(connfd);
+			printf("Session ended.\n");
+			printf("=============================\n");
 			exit(0);
 		}
 

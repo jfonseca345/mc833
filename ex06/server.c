@@ -40,7 +40,7 @@ void exec_cmd(char *cmd, int sock) {
  * Exec cmd and send output to client
  */
 void exec_and_echo(char *cmd, int sock) {
-//	cmd[strlen(cmd) - 2] = 0;
+//	cmd[strlen(cmd) - 2] = 0; // discart new line, for telnet tests.
 	system(cmd);
 	write(sock, cmd, strlen(cmd));
 }
@@ -52,9 +52,8 @@ int main(int argc, char **argv) {
 	char cmd[MAXDATASIZE]; // buffer that will cotain data to be send to client.
 	int port;
 
-	struct sockaddr_in addr; // struct that will contain remote address info.
-	socklen_t len; // addr size
-	char ipstr[INET6_ADDRSTRLEN];
+	struct sockaddr_in client_addr; // struct that will contain remote address info.
+	socklen_t client_len; // addr size
 
 	pid_t pid;
 
@@ -88,7 +87,7 @@ int main(int argc, char **argv) {
 		/** Extract the first pending connection request on listenfd queue,
 		 *  creates a new socket and return a new file descriptor for it.
 		 *  Also verify return for error checking. **/
-		connfd = Accept(listenfd, (struct sockaddr *) NULL, NULL);
+		connfd = Accept(listenfd, (struct sockaddr *) &client_addr, &client_len);
 
 		/** creat child to answer **/
 		if ((pid = fork()) == 0) {
@@ -97,14 +96,13 @@ int main(int argc, char **argv) {
 			printf("=============================\n");
 			printf("Session started.\n");
 			printf("Client host info:\n");
-			print_sock_info(connfd);
+			printf("%s : %d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
 			bzero(cmd, sizeof(cmd));
 			while (read(connfd, cmd, sizeof(cmd))) {
 				exec_and_echo(cmd, connfd);
 				bzero(cmd, sizeof(cmd));
 			}
-//			read(connfd, cmd, sizeof(cmd));
 
 			close(connfd);
 			printf("Session ended.\n");
@@ -112,14 +110,8 @@ int main(int argc, char **argv) {
 			exit(0);
 		}
 
-		/** get address info of socket connfd. **/
-		getpeername(connfd, (struct sockaddr *) &addr, &len);
-		/** convert read address from binary to string. **/
-		inet_ntop(AF_INET, &addr.sin_addr, ipstr, sizeof(ipstr));
-		/** print socket address info **/
-//		printf("%s : %d\n", ipstr, ntohs(addr.sin_port));
 
-//		/** close socket connfd**/
+		/** close socket connfd**/
 		close(connfd);
 	}
 	return (0);

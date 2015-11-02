@@ -70,11 +70,4 @@ void Connect(int socket, struct sockaddr *addr, socklen_t length) {
 	}
 }
 
-void print_sock_info(int socket) {
-	struct sockaddr_in addr; // struct that will contain remote address info.
-	socklen_t len; // addr size
-	getsockname(socket, (struct sockaddr *) &addr, &len);
-	printf("%s : %d\n", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
-}
-
 #endif /* EX06_SOCKUTILS_H_ */

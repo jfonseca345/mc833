@@ -73,19 +73,18 @@ int main(int argc, char **argv) {
 		printf(">> ");
 
 		fgets(cmd, MAXDATASIZE, stdin);
+
 		remove_nl(cmd);
 		write(sockfd, cmd, strlen(cmd));
-		printf("\n");
-
+		if (!strcmp(cmd, "exit"))
+			break;
 		/** Read data from socket to recvline. Size is returned to n.**/
-		while((n = read(sockfd, recvline, MAXLINE))) {
-			recvline[n] = 0;
-			printf("%s\n", recvline);
-		}
-
-		printf("\n");
-
+		n = read(sockfd, recvline, MAXLINE);
+		recvline[n] = 0;
+		printf("%s", recvline);
 	}
+
+	close(sockfd);
 
 	/** print error if no data was read. **/
 	if (n < 0) {

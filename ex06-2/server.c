@@ -19,18 +19,25 @@
  * Exec cmd and send output to client (This is will be used in next activity)
  */
 void exec_cmd(char *cmd, int sock) {
-	char output[MAXOUTPUTSIZE] = { 0 };
+	char output_ln[MAXOUTPUTSIZE] = { 0 };
+	char output[MAXOUTPUTSIZE * 10] = {0};
 	FILE *fp;
 
 	/** Discard new line stuff, for telnet reason.**/
-	cmd[strlen(cmd) - 2] = 0;
+//	cmd[strlen(cmd) - 2] = 0;
+	/** redirect errors **/
 	strcat(cmd, " 2>&1");
 
 	fp = popen(cmd, "r");
 
-	while (fgets(output, sizeof(output) - 1, fp) != NULL) {
-		write(sock, output, strlen(output));
+	fgets(output_ln, sizeof(output_ln) - 1, fp);
+	strcpy(output, output_ln);
+
+	while (fgets(output_ln, sizeof(output_ln) - 1, fp) != NULL) {
+		strcat(output, output_ln);
 	}
+
+	write(sock, output, strlen(output));
 
 	pclose(fp);
 
@@ -106,12 +113,12 @@ int main(int argc, char **argv) {
 				if (!strcmp(cmd, "exit"))
 					break;
 
-				printf("%s : %d>> %s\n", client_address, client_port, cmd);
+				printf("%s:%d>> %s\n", client_address, client_port, cmd);
 				exec_cmd(cmd, connfd);
 			}
 
 			close(connfd);
-			printf("%s : %d: Connection closed.\n", client_address, client_port);
+			printf("%s:%d: Connection closed.\n", client_address, client_port);
 			exit(0);
 		}
 

@@ -20,7 +20,7 @@
  */
 void exec_cmd(char *cmd, int sock) {
 	char output_ln[MAXOUTPUTSIZE] = { 0 };
-	char output[MAXOUTPUTSIZE * 10] = {0};
+	char output[MAXOUTPUTSIZE * 10] = { 0 };
 	FILE *fp;
 
 	/** Discard new line stuff, for telnet reason.**/
@@ -67,6 +67,9 @@ int main(int argc, char **argv) {
 	char client_address[20] = { 0 };
 	int client_port;
 
+	FILE *logfile = fopen("log", "w");
+	time_t ticks;
+
 	if (argc < 2) {
 		printf("Usage:\n\t%s <listen-port>\n", argv[0]);
 		exit(1);
@@ -106,6 +109,13 @@ int main(int argc, char **argv) {
 
 			strcpy(client_address, inet_ntoa(client_addr.sin_addr));
 			client_port = ntohs(client_addr.sin_port);
+
+			printf("%s:%d: Connection opened.\n", client_address, client_port);
+
+			ticks = time(NULL);
+			fprintf(logfile, "%s:%d:%.24s: Connected.\n", client_address,
+					client_port, ctime(&ticks));
+
 			while (1) {
 				bzero(cmd, sizeof(cmd));
 				read(connfd, cmd, sizeof(cmd));
@@ -119,6 +129,10 @@ int main(int argc, char **argv) {
 
 			close(connfd);
 			printf("%s:%d: Connection closed.\n", client_address, client_port);
+			ticks = time(NULL);
+			fprintf(logfile, "%s:%d:%.24s: Disconnected.\n", client_address,
+					client_port, ctime(&ticks));
+			fclose(logfile);
 			exit(0);
 		}
 

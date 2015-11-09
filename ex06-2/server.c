@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
 
 		/** create child to answer **/
 		if ((pid = fork()) == 0) {
-			close(listenfd);
+			Close(listenfd);
 
 			strcpy(client_address, inet_ntoa(client_addr.sin_addr));
 			client_port = ntohs(client_addr.sin_port);
@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
 				exec_cmd(cmd, connfd);
 			}
 
-			close(connfd);
+			Close(connfd);
 			printf("%s:%d: Connection closed.\n", client_address, client_port);
 			ticks = time(NULL);
 			fprintf(logfile, "%s:%d:%.24s: Disconnected.\n", client_address,
@@ -137,7 +137,7 @@ int main(int argc, char **argv) {
 		}
 
 		/** close socket connfd**/
-		close(connfd);
+		Close(connfd);
 	}
 	return (0);
 }

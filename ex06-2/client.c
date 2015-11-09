@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
 		printf("%s", recvline);
 	}
 
-	close(sockfd);
+	Close(sockfd);
 
 	/** print error if no data was read. **/
 	if (n < 0) {

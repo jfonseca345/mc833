@@ -58,6 +58,7 @@ int main(int argc, char **argv) {
 	struct sockaddr_in servaddr; // struct that will contain server address info.
 	char cmd[MAXDATASIZE]; // buffer that will contain data to be send to client.
 	int port;
+	int backlog_sz;
 
 	struct sockaddr_in client_addr; // struct that will contain remote address info.
 	socklen_t client_len = sizeof(client_addr); // addr size
@@ -70,12 +71,13 @@ int main(int argc, char **argv) {
 	FILE *logfile = fopen("log", "w");
 	time_t ticks;
 
-	if (argc < 2) {
-		printf("Usage:\n\t%s <listen-port>\n", argv[0]);
+	if (argc < 3) {
+		printf("Usage:\n\t%s <listen-port> <backlog-size>\n", argv[0]);
 		exit(1);
 	}
 
 	port = atoi(argv[1]);
+	backlog_sz = atoi(argv[2]);
 
 	/** Create a ipv4 TCP socket that will be used to listen connections.
 	 *  Also verify return for error checking. **/
@@ -93,7 +95,7 @@ int main(int argc, char **argv) {
 	/** Marks the socket listenfd as a passsive socket that will respond
 	 *  to connection requests and will have a queue with a maximum length
 	 *  of LISTENQ. **/
-	Listen(listenfd, LISTENQ);
+	Listen(listenfd, backlog_sz);
 
 	/** loops forever. **/
 	for (;;) {
@@ -116,17 +118,17 @@ int main(int argc, char **argv) {
 			fprintf(logfile, "%s:%d:%.24s: Connected.\n", client_address,
 					client_port, ctime(&ticks));
 
-			while (1) {
-				bzero(cmd, sizeof(cmd));
-				read(connfd, cmd, sizeof(cmd));
-
+			bzero(cmd, sizeof(cmd));
+			while (read(connfd, cmd, sizeof(cmd))) {
 				if (!strcmp(cmd, "exit"))
 					break;
 
 				printf("%s:%d>> %s\n", client_address, client_port, cmd);
 				exec_cmd(cmd, connfd);
+				bzero(cmd, sizeof(cmd));
 			}
 
+			sleep(5);
 			Close(connfd);
 			printf("%s:%d: Connection closed.\n", client_address, client_port);
 			ticks = time(NULL);

@@ -39,3 +39,4 @@
 server
 client
 log
+*.txt

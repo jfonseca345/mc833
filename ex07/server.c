@@ -96,14 +96,21 @@ int main(int argc, char **argv) {
 	 *  to connection requests and will have a queue with a maximum length
 	 *  of LISTENQ. **/
 	Listen(listenfd, backlog_sz);
+	sleep(5);
+	Signal(SIGCHLD, sig_chld);
 
 	/** loops forever. **/
 	for (;;) {
 		/** Extract the first pending connection request on listenfd queue,
 		 *  creates a new socket and return a new file descriptor for it.
 		 *  Also verify return for error checking. **/
-		connfd = Accept(listenfd, (struct sockaddr *) &client_addr,
-				&client_len);
+		if ((connfd = Accept(listenfd, (struct sockaddr *) &client_addr,
+				&client_len)) < 0) {
+			if (errno == EINTR)
+				continue; /* se for tratar o sinal,quando voltar dá erro em funções lentas */
+			else
+				err_sys("accept error");
+		}
 
 		/** create child to answer **/
 		if ((pid = fork()) == 0) {
@@ -128,7 +135,6 @@ int main(int argc, char **argv) {
 				bzero(cmd, sizeof(cmd));
 			}
 
-			sleep(5);
 			Close(connfd);
 			printf("%s:%d: Connection closed.\n", client_address, client_port);
 			ticks = time(NULL);

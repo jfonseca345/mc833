@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -g
 DEPS=myconn_err.h
-SRCDIR=ex07/
+SRCDIR=ex08/
 HEADERS=$(SRCDIR)/*.h
 
 all: server client

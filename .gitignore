@@ -40,3 +40,7 @@ server
 client
 log
 *.txt
+
+#test files
+in
+out

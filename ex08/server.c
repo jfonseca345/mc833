@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 	int port;
 
 	struct sockaddr_in client_addr; // struct that will contain remote address info.
-	socklen_t client_len; // addr size
+	socklen_t client_len = sizeof(client_addr); // addr size
 
 	pid_t pid;
 

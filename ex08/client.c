@@ -70,13 +70,13 @@ int main(int argc, char **argv) {
 	printf("=============================\n");
 
 	while (1) {
-		printf(">> ");
+//		printf(">> "); // taking fancy stuffs off.
 
 		fgets(cmd, MAXDATASIZE, stdin);
 		remove_nl(cmd);
 		write(sockfd, cmd, strlen(cmd));
-		printf("Send command: %s\n", cmd);
-		printf("Echo command: ");
+//		printf("Send command: %s\n", cmd);
+//		printf("Echo command: ");
 
 		/** Read data from socket to recvline. Size is returned to n.**/
 		n = read(sockfd, recvline, MAXLINE);
